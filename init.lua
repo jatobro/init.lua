@@ -64,6 +64,8 @@ vim.o.winborder = "rounded"
 
 -- [[ Basic Keymaps ]]
 
+vim.keymap.set("n", "<leader>e", vim.cmd.Ex)
+
 -- Clear highlights on search when pressing <Esc> in normal mode
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
 
@@ -98,6 +100,9 @@ vim.keymap.set("n", "<C-k>", "<C-w><C-k>", { desc = "Move focus to the upper win
 -- vim.keymap.set("n", "<C-S-k>", "<C-w>K", { desc = "Move window to the upper" })
 
 -- [[ Basic Autocommands ]]
+
+-- Grey-out unused unnecessary
+vim.api.nvim_set_hl(0, "DiagnosticUnnecessary", { link = "Comment" })
 
 -- Highlight when yanking (copying) text
 --  Try it with `yap` in normal mode
@@ -521,45 +526,6 @@ require("lazy").setup({
     end,
   },
 
-  { -- Autoformat
-    "stevearc/conform.nvim",
-    event = { "BufWritePre" },
-    cmd = { "ConformInfo" },
-    keys = {
-      {
-        "<leader>f",
-        function() require("conform").format { async = true, lsp_format = "fallback" } end,
-        mode = "",
-        desc = "[F]ormat buffer",
-      },
-    },
-    opts = {
-      notify_on_error = false,
-      format_on_save = function(bufnr)
-        -- Disable "format_on_save lsp_fallback" for languages that don't
-        -- have a well standardized coding style. You can add additional
-        -- languages here or re-enable it for the disabled ones.
-        local disable_filetypes = { c = true, cpp = true }
-        if disable_filetypes[vim.bo[bufnr].filetype] then
-          return nil
-        else
-          return {
-            timeout_ms = 500,
-            lsp_format = "fallback",
-          }
-        end
-      end,
-      formatters_by_ft = {
-        lua = { "stylua" },
-        -- Conform can also run multiple formatters sequentially
-        -- python = { "isort", "black" },
-        --
-        -- You can use 'stop_after_first' to run the first available formatter from the list
-        -- javascript = { "prettierd", "prettier", stop_after_first = true },
-      },
-    },
-  },
-
   { -- Autocompletion
     "saghen/blink.cmp",
     event = "VimEnter",
@@ -692,19 +658,9 @@ require("lazy").setup({
     end,
   },
 
-  { -- Highlight, edit, and navigate code
-    "nvim-treesitter/nvim-treesitter",
-    config = function()
-      local filetypes = { "bash", "c", "diff", "html", "lua", "luadoc", "markdown", "markdown_inline", "query", "vim", "vimdoc" }
-      require("nvim-treesitter").install(filetypes)
-      vim.api.nvim_create_autocmd("FileType", {
-        pattern = filetypes,
-        callback = function() vim.treesitter.start() end,
-      })
-    end,
-  },
-
+  require "jatobro.lazy.conform",
   require "jatobro.lazy.colors",
+  require "jatobro.lazy.lazygit",
 
   -- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
